@@ -13,6 +13,7 @@ class Sensor {
     
   public:
     Sensor();
+    enum SensorType { BRIGHTNESS_SENSOR, TEMPERATURE_SENSOR };
     int getPinId() const;
     void setPinId(int);
     String getName() const;
@@ -23,7 +24,7 @@ class Sensor {
     void setIsOn(boolean);
     float getCurrentValue();
     void setCurrentValue(float);
-
+    static Sensor createSensor(SensorType type, int pinId, String name);
 };
 
 #endif

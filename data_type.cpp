@@ -63,3 +63,18 @@ float Sensor::getCurrentValue() {
 void Sensor::setCurrentValue(float value) {
   this->currentValue = value;
 }
+
+Sensor Sensor::createSensor(SensorType type, int pinId, String name) {
+  Sensor sensor;
+  sensor.setPinId(pinId);
+  sensor.setName(name);
+  sensor.setIsOn(true);
+  sensor.setCurrentValue(0);
+
+  if(type == Sensor::SensorType::BRIGHTNESS_SENSOR)
+    sensor.setType("brightness");
+  else if (type == Sensor::SensorType::TEMPERATURE_SENSOR)
+    sensor.setType("temperature");
+
+  return sensor;
+}

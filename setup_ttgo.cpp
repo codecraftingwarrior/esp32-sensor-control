@@ -9,29 +9,6 @@ void initLeds(int leds[], int size) {
     pinMode(leds[i], OUTPUT);
 }
 
-Sensor createBrightnessSensor(int pin, String name) {
-  Sensor sensor;
-  sensor.setPinId(pin);
-  sensor.setName(name);
-  sensor.setType("brightness");
-  sensor.setIsOn(true);
-  sensor.setCurrentValue(0);
-
-  return sensor;
-}
-
-Sensor createTemperatureSensor(int pin, String name) {
-  Sensor sensor;
-  sensor.setPinId(pin);
-  sensor.setName(name);
-  sensor.setType("temperature");
-  sensor.setIsOn(true);
-  sensor.setCurrentValue(0);
-
-  return sensor;
-}
-
-
 WebServiceController::WebServiceController(AsyncWebServer& server, Sensor* sensors, int sensorCount) : server(server), sensors(sensors), sensorCount(sensorCount) {
   server.on("/sensors", HTTP_GET, std::bind(&WebServiceController::findSensors, this, std::placeholders::_1));
 }

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <functional>
 #include "setup_ttgo.h"
 #include "network.h"
 #include "utils.h"
@@ -14,6 +13,9 @@ int lightSensorThreshold = 600;
 int temperatureSensorThreshold = 50;
 AsyncWebServer server(80);
 
+Sensor lightSensor;
+Sensor temperatureSensor;
+
 void setup() {
   Serial.begin(115200);
   
@@ -22,11 +24,13 @@ void setup() {
   int leds[2] = {RED_PIN, YELLOW_PIN};
   initLeds(leds, 2);
 
-  Sensor sensors[2];
-  sensors[0] = createBrightnessSensor(LIGHT_SENSOR_PIN, "Photoresistance");
-  sensors[1] = createTemperatureSensor(TEMPERATURE_SENSOR_PIN, "Thermistance");
+  lightSensor = Sensor::createSensor(Sensor::SensorType::BRIGHTNESS_SENSOR, LIGHT_SENSOR_PIN, "Photoresistance");
+  temperatureSensor = Sensor::createSensor(Sensor::SensorType::TEMPERATURE_SENSOR, TEMPERATURE_SENSOR_PIN, "Thermistance");
+
+  Sensor sensors[2] = {lightSensor, temperatureSensor};
 
   WebServiceController controller(server, sensors, 2);
+  
   server.begin();
 }
 
