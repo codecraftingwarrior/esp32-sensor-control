@@ -6,6 +6,7 @@
 class Sensor { 
   private:
     int pinId;
+    float threshold;
     String name;
     String type;
     boolean isOn;
@@ -24,7 +25,9 @@ class Sensor {
     void setIsOn(boolean);
     float getCurrentValue();
     void setCurrentValue(float);
-    static Sensor createSensor(SensorType type, int pinId, String name);
+    float getThreshold();
+    float setThreshold(float);
+    static Sensor createSensor(SensorType type, int pinId, String name, float threshold);
 };
 
 #endif

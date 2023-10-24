@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#define ASYNCWEBSERVER_REGEX 1
 #include "setup_ttgo.h"
 #include <ESPAsyncWebSrv.h>
 #include <ArduinoJson.h>
@@ -11,6 +12,7 @@ void initLeds(int leds[], int size) {
 
 WebServiceController::WebServiceController(AsyncWebServer& server, Sensor* sensors, int sensorCount) : server(server), sensors(sensors), sensorCount(sensorCount) {
   server.on("/sensors", HTTP_GET, std::bind(&WebServiceController::findSensors, this, std::placeholders::_1));
+  server.on("/sensors/{id}/threshold", HTTP_PUT, std::bind(&WebServiceController::updateThreshold, this, std::placeholders::_1));
 }
 
 void WebServiceController::findSensors(AsyncWebServerRequest *request) {
@@ -30,4 +32,44 @@ void WebServiceController::findSensors(AsyncWebServerRequest *request) {
   serializeJson(sensorData, jsonResponse);
 
   request->send(200, "application/json", jsonResponse);
+}
+
+void WebServiceController::updateThreshold(AsyncWebServerRequest *request) {
+  String rawId = request->pathArg(0);
+  int sensorId = rawId.toInt();
+  DynamicJsonDocument responseDoc(1024);
+
+  bool founded = false;
+  for(int i=0; i<this->sensorCount; i++) 
+    if(this->sensors[i].getPinId() == sensorId)
+      founded = true;
+
+  if(founded) {
+        Sensor &sensor = this->sensors[sensorId];
+
+        DynamicJsonDocument jsonDoc(1024);
+        deserializeJson(jsonDoc, request->arg("plain"));
+
+        if (jsonDoc.containsKey("threshold")) {
+            float newThreshold = jsonDoc["threshold"];
+            
+            sensor.setThreshold(newThreshold);
+            
+            responseDoc["success"] = true;
+            responseDoc["message"] = "Seuil mis à jour avec succés.";
+        } else {
+            responseDoc["success"] = false;
+            responseDoc["error"] = "Veuillez fournir le champ 'threshold'.";
+        }
+    
+  } else {
+    responseDoc["success"] = false;
+    responseDoc["error"] = "Capteur introuvable.";
+  }
+
+
+  String jsonResponse;
+  serializeJson(responseDoc, jsonResponse);
+
+ request->send(200, "application/json", jsonResponse);  
 }

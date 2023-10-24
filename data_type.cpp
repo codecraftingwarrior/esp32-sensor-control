@@ -64,12 +64,21 @@ void Sensor::setCurrentValue(float value) {
   this->currentValue = value;
 }
 
-Sensor Sensor::createSensor(SensorType type, int pinId, String name) {
+float Sensor::getThreshold() {
+  return this->threshold;
+}
+
+float Sensor::setThreshold(float newValue) {
+  this->threshold = newValue;
+}
+
+Sensor Sensor::createSensor(SensorType type, int pinId, String name, float threshold) {
   Sensor sensor;
   sensor.setPinId(pinId);
   sensor.setName(name);
   sensor.setIsOn(true);
   sensor.setCurrentValue(0);
+  sensor.setThreshold(threshold);
 
   if(type == Sensor::SensorType::BRIGHTNESS_SENSOR)
     sensor.setType("brightness");
