@@ -11,8 +11,11 @@ void initLeds(int leds[], int size) {
 }
 
 WebServiceController::WebServiceController(AsyncWebServer& server, Sensor* sensors, int sensorCount) : server(server), sensors(sensors), sensorCount(sensorCount) {
+  
   server.on("/sensors", HTTP_GET, std::bind(&WebServiceController::findSensors, this, std::placeholders::_1));
   server.on("/sensors/{id}/threshold", HTTP_PUT, std::bind(&WebServiceController::updateThreshold, this, std::placeholders::_1));
+  
+  server.on("/leds/{id}", HTTP_PUT, std::bind(&WebServiceController::switchLed, this, std::placeholders::_1));
 }
 
 void WebServiceController::findSensors(AsyncWebServerRequest *request) {
@@ -72,4 +75,12 @@ void WebServiceController::updateThreshold(AsyncWebServerRequest *request) {
   serializeJson(responseDoc, jsonResponse);
 
  request->send(200, "application/json", jsonResponse);  
+}
+
+void WebServiceController::switchLed(AsyncWebServerRequest *request) {
+  String rawId = request->pathArg(0);
+  int ledPinId = rawId.toInt();
+  DynamicJsonDocument responseDoc(1024);
+
+  // to be continue
 }
