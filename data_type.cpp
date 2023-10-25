@@ -87,3 +87,47 @@ Sensor Sensor::createSensor(SensorType type, int pinId, String name, float thres
 
   return sensor;
 }
+
+
+LED::LED() {}
+
+int LED::getPinId() const {
+  return this->pinId;
+}
+
+void LED::setPinId(int pin) {
+  this->pinId = pin;
+}
+
+boolean LED::getIsOn() const {
+  return this->isOn;
+}
+
+void LED::setIsOn(boolean on) {
+  this->isOn = on;
+}
+
+String LED::getColor() const {
+  return this->color;
+}
+
+void LED::setColor(String color) {
+  this->color = color;
+}
+
+String LED::getName() const {
+  return this->name;
+}
+
+void LED::setName(String name) {
+  this->name = name;
+}
+
+LED LED::createLED(int pinId, boolean isOn, String color, String name) {
+  LED led;
+  led.setPinId(pinId);
+  led.setIsOn(isOn);
+  led.setColor(color);
+  led.setName(name);
+  return led;
+}

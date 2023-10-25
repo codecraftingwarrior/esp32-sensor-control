@@ -22,6 +22,7 @@ private:
     int sensorCount;
     void findSensors(AsyncWebServerRequest *request);
     void updateThreshold(AsyncWebServerRequest *request);
+    void switchLed(AsyncWebServerRequest *request);
 }; 
 
 #endif

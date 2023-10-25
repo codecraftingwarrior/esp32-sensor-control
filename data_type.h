@@ -30,4 +30,24 @@ class Sensor {
     static Sensor createSensor(SensorType type, int pinId, String name, float threshold);
 };
 
+class LED {
+  private:
+    int pinId;
+    boolean isOn;
+    String color;
+    String name;
+
+  public:
+    LED();
+    int getPinId() const;
+    void setPinId(int);
+    boolean getIsOn() const;
+    void setIsOn(boolean);
+    String getColor() const;
+    void setColor(String);
+    String getName() const;
+    void setName(String);
+    static LED createLED(int pinId, boolean isOn, String color, String name);
+};
+
 #endif
