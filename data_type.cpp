@@ -129,5 +129,26 @@ LED LED::createLED(int pinId, boolean isOn, String color, String name) {
   led.setIsOn(isOn);
   led.setColor(color);
   led.setName(name);
+  
+  pinMode(pinId, OUTPUT);
   return led;
+}
+
+void LED::toggle() {
+  if(this->isOn) {
+    digitalWrite(this->pinId, LOW);
+  } else {
+    digitalWrite(this->pinId, HIGH);
+  }
+  this->isOn = !this->isOn;
+}
+
+void LED::switchOff() {
+  this->isOn = false;
+  digitalWrite(this->pinId, LOW);
+}
+
+void LED::switchOn() {
+  this->isOn = true;
+  digitalWrite(this->pinId, HIGH);
 }

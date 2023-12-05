@@ -20,16 +20,17 @@ void setup() {
   Serial.begin(115200);
   
   NetworkManager::connectToWiFi();
-  
-  int leds[2] = {RED_PIN, YELLOW_PIN};
-  initLeds(leds, 2);
+
+  LED lightLED = LED::createLED(RED_PIN, false, "red", "LED light control");
+  LED temperatureLED = LED::createLED(YELLOW_PIN, false, "yellow", "LED temperature control");
 
   lightSensor = Sensor::createSensor(Sensor::SensorType::BRIGHTNESS_SENSOR, LIGHT_SENSOR_PIN, "Photoresistance", lightSensorThreshold);
   temperatureSensor = Sensor::createSensor(Sensor::SensorType::TEMPERATURE_SENSOR, TEMPERATURE_SENSOR_PIN, "Thermistance", temperatureSensorThreshold);
 
   Sensor sensors[2] = {lightSensor, temperatureSensor};
-
-  WebServiceController controller(server, sensors, 2);
+  LED leds[2] = {lightLED, temperatureLED};
+  
+  WebServiceController controller(server, sensors, 2, leds, 2);
   
   server.begin();
 }

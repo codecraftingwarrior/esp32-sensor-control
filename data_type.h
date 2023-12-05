@@ -48,6 +48,9 @@ class LED {
     String getName() const;
     void setName(String);
     static LED createLED(int pinId, boolean isOn, String color, String name);
+    void toggle();
+    void switchOff();
+    void switchOn();
 };
 
 #endif
