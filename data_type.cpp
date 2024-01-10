@@ -36,7 +36,7 @@ void Sensor::setIsOn(boolean state) {
 }
 
 float Sensor::getCurrentValue() {
-  const float BETA = 3950; 
+  /*const float BETA = 3950; 
   if (this->type.equals("temperature")) {
 
     int analogValue = analogRead(this->pinId);
@@ -55,9 +55,9 @@ float Sensor::getCurrentValue() {
     this->currentValue = lux;
   } else {
     this->currentValue = 0;
-  }
+  }*/
 
-  return this->currentValue;
+  return 0;
 }
 
 void Sensor::setCurrentValue(float value) {
@@ -68,7 +68,7 @@ float Sensor::getThreshold() {
   return this->threshold;
 }
 
-float Sensor::setThreshold(float newValue) {
+void Sensor::setThreshold(float newValue) {
   this->threshold = newValue;
 }
 
@@ -80,7 +80,7 @@ Sensor Sensor::createSensor(SensorType type, int pinId, String name, float thres
   sensor.setCurrentValue(0);
   sensor.setThreshold(threshold);
 
-  if(type == Sensor::SensorType::BRIGHTNESS_SENSOR)
+  if (type == Sensor::SensorType::BRIGHTNESS_SENSOR)
     sensor.setType("brightness");
   else if (type == Sensor::SensorType::TEMPERATURE_SENSOR)
     sensor.setType("temperature");
@@ -129,13 +129,14 @@ LED LED::createLED(int pinId, boolean isOn, String color, String name) {
   led.setIsOn(isOn);
   led.setColor(color);
   led.setName(name);
-  
+
   pinMode(pinId, OUTPUT);
   return led;
 }
 
 void LED::toggle() {
-  if(this->isOn) {
+  Serial.printf("Toggling LED on pin %d\n", this->getPinId());
+  if (this->isOn) {
     digitalWrite(this->pinId, LOW);
   } else {
     digitalWrite(this->pinId, HIGH);
@@ -144,11 +145,13 @@ void LED::toggle() {
 }
 
 void LED::switchOff() {
+  Serial.printf("Switching OFF LED on pin %d.\n", this->getPinId());
   this->isOn = false;
   digitalWrite(this->pinId, LOW);
 }
 
 void LED::switchOn() {
+  Serial.printf("Switching ON LED on pin %d.\n", this->getPinId());
   this->isOn = true;
   digitalWrite(this->pinId, HIGH);
 }

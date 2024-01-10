@@ -6,12 +6,11 @@ NetworkManager::NetworkManager() {}
 
 void NetworkManager::connectToWiFi() {
   
-  
   WiFi.begin(env("ssid").c_str(), env("password").c_str());
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connexion au Wi-Fi en cours...");
+    Serial.printf("Connexion au Wi-Fi %s en cours...\n", env("ssid").c_str());
   }
 
   Serial.println("Connecté au réseau Wi-Fi");

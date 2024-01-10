@@ -6,7 +6,7 @@
 
 String env(String key) {
   
-  String configFile = "{\"ssid\":\"ssid\", \"password\":\"thereisapwd\"}"; //simuler un fichier d'environnement
+  String configFile = "{\"ssid\":\"Code\ Crafting\ Warrior\", \"password\":\"azertyam\"}"; //simuler un fichier d'environnement
   
   if (!configFile) {
     Serial.println("Erreur lors de l'ouverture du fichier JSON.");

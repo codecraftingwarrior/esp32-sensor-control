@@ -13,30 +13,29 @@ int lightSensorThreshold = 600;
 int temperatureSensorThreshold = 50;
 AsyncWebServer server(80);
 
-Sensor lightSensor;
-Sensor temperatureSensor;
+std::vector<LED> ledVector;
+std::vector<Sensor> sensorVector;
+WebServiceController* controller = nullptr;  // Déclaration de controller comme pointeur global
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   NetworkManager::connectToWiFi();
 
   LED lightLED = LED::createLED(RED_PIN, false, "red", "LED light control");
   LED temperatureLED = LED::createLED(YELLOW_PIN, false, "yellow", "LED temperature control");
 
-  lightSensor = Sensor::createSensor(Sensor::SensorType::BRIGHTNESS_SENSOR, LIGHT_SENSOR_PIN, "Photoresistance", lightSensorThreshold);
-  temperatureSensor = Sensor::createSensor(Sensor::SensorType::TEMPERATURE_SENSOR, TEMPERATURE_SENSOR_PIN, "Thermistance", temperatureSensorThreshold);
+  sensorVector.push_back(Sensor::createSensor(Sensor::SensorType::BRIGHTNESS_SENSOR, LIGHT_SENSOR_PIN, "Photoresistance", lightSensorThreshold));
+  sensorVector.push_back(Sensor::createSensor(Sensor::SensorType::TEMPERATURE_SENSOR, TEMPERATURE_SENSOR_PIN, "Thermistance", temperatureSensorThreshold));
 
-  Sensor sensors[2] = {lightSensor, temperatureSensor};
-  LED leds[2] = {lightLED, temperatureLED};
+  ledVector.push_back(LED::createLED(RED_PIN, false, "red", "LED light control"));
+  ledVector.push_back(LED::createLED(YELLOW_PIN, false, "yellow", "LED temperature control"));
   
-  WebServiceController controller(server, sensors, 2, leds, 2);
+  controller = new WebServiceController(server, sensorVector, sensorVector.size(), ledVector, ledVector.size());
   
   server.begin();
 }
 
 void loop() {
-
-  
 
 }
