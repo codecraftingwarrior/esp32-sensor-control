@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include "data_type.h"
 
+const String Sensor::SENSOR_BRIGHTNESS_TYPE = "brightness";
+const String Sensor::SENSOR_TEMPERATURE_TYPE = "temperature";
+
 Sensor::Sensor() {}
 
 int Sensor::getPinId() const {
@@ -36,28 +39,35 @@ void Sensor::setIsOn(boolean state) {
 }
 
 float Sensor::getCurrentValue() {
-  /*const float BETA = 3950; 
+  const float VCC = 3.3;      // Tension d'alimentation
+  const int ADC_MAX = 4095;   // Maximum de la lecture ADC
+  const float R_REF = 10000;  // Résistance de référence en ohms
+  const float BETA = 3950;    // Valeur Bêta de la thermistance
+  const float R0 = 10000;     // Résistance de la thermistance à 25°C
+  const float T0 = 298.15;
   if (this->type.equals("temperature")) {
 
-    int analogValue = analogRead(this->pinId);
-    float celsius = 1 / (log(1 / (1023. / analogValue - 1)) / BETA + 1.0 / 298.15) - 273.15;
+    int analogValue = analogRead(this->getPinId());
 
-    this->currentValue = celsius;
+    float R_thermistor = R_REF * (float(analogValue) / (ADC_MAX - analogValue));
+
+    // Calcul de la température en Kelvin
+    float temperatureK = BETA / (log(R_thermistor / R0) + (BETA / T0));
+
+    // Convertir la température en Celsius
+    float temperatureC = temperatureK - 273.15;
+
+    this->currentValue = temperatureC;
   } else if (this->type.equals("brightness")) {
-    const float GAMMA = 0.7;
-    const float RL10 = 50;
 
-    int analogValue = analogRead(A0);
-    float voltage = analogValue / 1024. * 5;
-    float resistance = 2000 * voltage / (1 - voltage / 5);
-    float lux = pow(RL10 * 1e3 * pow(10, GAMMA) / resistance, (1 / GAMMA));
+    int analogValue = analogRead(this->pinId);
 
-    this->currentValue = lux;
+    this->currentValue = analogValue;
   } else {
     this->currentValue = 0;
-  }*/
+  }
 
-  return 0;
+  return this->currentValue;
 }
 
 void Sensor::setCurrentValue(float value) {
@@ -81,10 +91,11 @@ Sensor Sensor::createSensor(SensorType type, int pinId, String name, float thres
   sensor.setThreshold(threshold);
 
   if (type == Sensor::SensorType::BRIGHTNESS_SENSOR)
-    sensor.setType("brightness");
+    sensor.setType(Sensor::SENSOR_BRIGHTNESS_TYPE);
   else if (type == Sensor::SensorType::TEMPERATURE_SENSOR)
-    sensor.setType("temperature");
+    sensor.setType(Sensor::SENSOR_TEMPERATURE_TYPE);
 
+  pinMode(pinId, INPUT);
   return sensor;
 }
 
@@ -121,6 +132,13 @@ String LED::getName() const {
 
 void LED::setName(String name) {
   this->name = name;
+}
+
+void LED::blink(int delayVal) {
+  this->switchOn();
+  delay(delayVal);
+  this->switchOff();
+  delay(delayVal);
 }
 
 LED LED::createLED(int pinId, boolean isOn, String color, String name) {

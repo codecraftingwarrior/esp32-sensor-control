@@ -9,11 +9,11 @@ void initLeds(int leds[], int size) {
     pinMode(leds[i], OUTPUT);
 }
 
-WebServiceController::WebServiceController(AsyncWebServer &serverRef, std::vector<Sensor> &sensorsRef, int sensorCountRef, std::vector<LED> &ledsRef, int ledCountRef)
+WebServiceController::WebServiceController(AsyncWebServer &serverRef, std::vector<Sensor*> &sensorsRef, int sensorCountRef, std::vector<LED> &ledsRef, int ledCountRef)
   : server(serverRef), sensors(sensorsRef), sensorCount(sensorCountRef), leds(ledsRef), ledCount(ledCountRef) {
 
   server.on("/sensors", HTTP_GET, std::bind(&WebServiceController::findSensors, this, std::placeholders::_1));
-  server.on("/sensors/{id}/threshold", HTTP_PUT, std::bind(&WebServiceController::updateThreshold, this, std::placeholders::_1));
+  server.on("/sensors/update-threshold", HTTP_PUT, std::bind(&WebServiceController::updateThreshold, this, std::placeholders::_1));
 
   server.on("/leds", HTTP_GET, std::bind(&WebServiceController::fetchLeds, this, std::placeholders::_1));
   server.on("/switch-leds", HTTP_PUT, std::bind(&WebServiceController::switchLed, this, std::placeholders::_1));
@@ -26,11 +26,11 @@ void WebServiceController::findSensors(AsyncWebServerRequest *request) {
 
   for (int i = 0; i < this->sensorCount; i++) {
     JsonObject sensorObj = sensorArray.createNestedObject();
-    sensorObj["pinId"] = this->sensors[i].getPinId();
-    sensorObj["name"] = this->sensors[i].getName();
-    sensorObj["type"] = this->sensors[i].getType();
-    sensorObj["isOn"] = this->sensors[i].getIsOn();
-    sensorObj["currentValue"] = this->sensors[i].getCurrentValue();
+    sensorObj["pinId"] = this->sensors[i]->getPinId();
+    sensorObj["name"] = this->sensors[i]->getName();
+    sensorObj["type"] = this->sensors[i]->getType();
+    sensorObj["isOn"] = this->sensors[i]->getIsOn();
+    sensorObj["currentValue"] = this->sensors[i]->getCurrentValue();
   }
 
   String jsonResponse;
@@ -40,45 +40,68 @@ void WebServiceController::findSensors(AsyncWebServerRequest *request) {
 }
 
 void WebServiceController::updateThreshold(AsyncWebServerRequest *request) {
-  String rawId = request->pathArg(0);
-  int sensorId = rawId.toInt();
+  const char *TYPE_FIELD = "type";
+  const char *THRESHOLD_FIELD = "threshold";
   DynamicJsonDocument responseDoc(1024);
+  int statusCode = 200;
+
+  String type = "";
+  if (request->hasParam(TYPE_FIELD))
+    type = request->getParam(TYPE_FIELD)->value();
+
+  String rawThreshold = "";
+  if (request->hasParam(THRESHOLD_FIELD))
+    rawThreshold = request->getParam(THRESHOLD_FIELD)->value();
+
+  if ((type == "" || type == NULL) || (type != Sensor::SENSOR_BRIGHTNESS_TYPE && type != Sensor::SENSOR_TEMPERATURE_TYPE)) {
+    responseDoc["state"] = "failure";
+    responseDoc["error"] = "Veuillez fournir un type de capteur valide.";
+    statusCode = 422;
+
+    String jsonResponse;
+    serializeJson(responseDoc, jsonResponse);
+
+    request->send(statusCode, "application/json", jsonResponse);
+  }
+
+  if (rawThreshold == "" || rawThreshold == NULL) {
+    responseDoc["state"] = "failure";
+    responseDoc["error"] = "Un seuil valide.";
+    statusCode = 422;
+
+    String jsonResponse;
+    serializeJson(responseDoc, jsonResponse);
+
+    request->send(statusCode, "application/json", jsonResponse);
+  }
+
   Sensor *sensor = NULL;
 
   bool founded = false;
   for (int i = 0; i < this->sensorCount; i++)
-    if (this->sensors[i].getPinId() == sensorId) {
+    if (this->sensors[i]->getType().equals(type)) {
       founded = true;
-      sensor = &this->sensors[i];
+      sensor = this->sensors[i];
       break;
     }
 
   if (founded) {
-    // Sensor &sensor = this->sensors[sensorId];
+    float newThreshold = rawThreshold.toFloat();
 
-    DynamicJsonDocument jsonDoc(1024);
-    deserializeJson(jsonDoc, request->arg("plain"));
+    sensor->setThreshold(newThreshold);
 
-    if (jsonDoc.containsKey("threshold")) {
-      float newThreshold = jsonDoc["threshold"];
-
-      sensor->setThreshold(newThreshold);
-
-      responseDoc["success"] = true;
-      responseDoc["message"] = "Seuil mis à jour avec succés.";
-    } else {
-      responseDoc["success"] = false;
-      responseDoc["error"] = "Veuillez fournir le champ 'threshold'.";
-    }
+    responseDoc["state"] = "success";
+    responseDoc["message"] = "Seuil mis à jour avec succés.";
   } else {
-    responseDoc["success"] = false;
+    responseDoc["state"] = "failure";
     responseDoc["error"] = "Capteur introuvable.";
+    statusCode = 404;
   }
 
   String jsonResponse;
   serializeJson(responseDoc, jsonResponse);
 
-  request->send(200, "application/json", jsonResponse);
+  request->send(statusCode, "application/json", jsonResponse);
 }
 
 void WebServiceController::switchLed(AsyncWebServerRequest *request) {
@@ -178,6 +201,7 @@ void WebServiceController::toggleLed(AsyncWebServerRequest *request) {
   if (founded) {
     led->toggle();
     responseDoc["state"] = "success";
+    responseDoc["message"] = "Operation reussi.";
   } else {
     responseDoc["state"] = "failure";
     responseDoc["error"] = "LED introuvable.";

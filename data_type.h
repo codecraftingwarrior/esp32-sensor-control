@@ -28,6 +28,8 @@ class Sensor {
     float getThreshold();
     void setThreshold(float);
     static Sensor createSensor(SensorType type, int pinId, String name, float threshold);
+    static const String SENSOR_BRIGHTNESS_TYPE;
+    static const String SENSOR_TEMPERATURE_TYPE;
 };
 
 class LED {
@@ -51,6 +53,7 @@ class LED {
     void toggle();
     void switchOff();
     void switchOn();
+    void blink(int delayVal);
 };
 
 #endif

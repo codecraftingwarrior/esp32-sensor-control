@@ -14,11 +14,11 @@ Sensor createTemperatureSensor(int pin, String name);
 
 class WebServiceController {
 public:
-    WebServiceController(AsyncWebServer& server, std::vector<Sensor>& sensors, int sensorCount, std::vector<LED>& ledsRef, int ledCount);
+    WebServiceController(AsyncWebServer& server, std::vector<Sensor*>& sensors, int sensorCount, std::vector<LED>& ledsRef, int ledCount);
 
 private:
     AsyncWebServer& server;
-    std::vector<Sensor>& sensors;
+    std::vector<Sensor*>& sensors;
     int sensorCount;
     std::vector<LED>& leds;
     int ledCount;
