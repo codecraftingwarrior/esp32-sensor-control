@@ -3,10 +3,10 @@
 #include "setup_ttgo.h"
 #include "network.h"
 #include "utils.h"
-#include <TFT_eSPI.h>  
+#include <TFT_eSPI.h>
 #include <SPI.h>
-
-TFT_eSPI tft = TFT_eSPI();  
+ 
+#include "firebase_utils.h"
 
 #define LIGHT_SENSOR_PIN 36
 #define TEMPERATURE_SENSOR_PIN 37
@@ -15,14 +15,17 @@ TFT_eSPI tft = TFT_eSPI();
 #define LIGHT_CONTROL_LED_PIN 33
 #define TEMPERATURE_CONTROL_LED_PIN 37
 
-int lightSensorThreshold = 500;
-int temperatureSensorThreshold = 20;
+TFT_eSPI tft = TFT_eSPI();
 
 AsyncWebServer server(80);
 
 std::vector<LED> ledVector;
 std::vector<Sensor*> sensorVector;
-WebServiceController* controller = nullptr; 
+WebServiceController* controller = nullptr;
+FirebaseUtils* firebase = nullptr;
+
+int lightSensorThreshold = 500;
+int temperatureSensorThreshold = 20;
 
 LED lightLED;
 LED temperatureLED;
@@ -54,14 +57,15 @@ void setup() {
   ledVector.push_back(temperatureLED);
 
   controller = new WebServiceController(server, sensorVector, sensorVector.size(), ledVector, ledVector.size());
+  firebase = new FirebaseUtils();
 
-  server.begin();
+  firebase->init();
 }
 
 void loop() {
 
   static unsigned long previousMillis = 0;
-  const long interval = 600; 
+  const long interval = 600;
 
   unsigned long currentMillis = millis();
 
@@ -79,5 +83,8 @@ void loop() {
 
     if (currentTemperatureValue < temperatureSensor.getThreshold())
       normalLED.blink(300);
+
+    //Envoie des données des capteurs dans firebase realtime database
+    firebase->storeSensorData(currentLightValue, currentTemperatureValue);
   }
 }
