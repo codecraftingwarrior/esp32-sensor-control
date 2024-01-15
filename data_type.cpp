@@ -42,7 +42,7 @@ float Sensor::getCurrentValue() {
   const float VCC = 3.3;      // Tension d'alimentation
   const int ADC_MAX = 4095;   // Maximum de la lecture ADC
   const float R_REF = 10000;  // Résistance de référence en ohms
-  const float BETA = 3950;    // Valeur Bêta de la thermistance
+  const float BETA = 3977;    // Valeur Bêta de la thermistance
   const float R0 = 10000;     // Résistance de la thermistance à 25°C
   const float T0 = 298.15;
   if (this->type.equals("temperature")) {
