@@ -5,10 +5,6 @@
 #include "data_type.h"
 
 
-void initLeds(int leds[], int size);
-
-void getTemperature(int pin);
-
 Sensor createBrightnessSensor(int pin, String name);
 Sensor createTemperatureSensor(int pin, String name);
 
@@ -27,7 +23,6 @@ private:
     void switchLed(AsyncWebServerRequest *request);
     void toggleLed(AsyncWebServerRequest *request);
     void fetchLeds(AsyncWebServerRequest *request);
-    void test(AsyncWebServerRequest *request);
 }; 
 
 #endif

@@ -4,14 +4,13 @@
 #include <ESPAsyncWebSrv.h>
 #include <ArduinoJson.h>
 
-void initLeds(int leds[], int size) {
-  for (int i = 0; i < size; i++)
-    pinMode(leds[i], OUTPUT);
-}
-
 WebServiceController::WebServiceController(AsyncWebServer &serverRef, std::vector<Sensor*> &sensorsRef, int sensorCountRef, std::vector<LED> &ledsRef, int ledCountRef)
   : server(serverRef), sensors(sensorsRef), sensorCount(sensorCountRef), leds(ledsRef), ledCount(ledCountRef) {
 
+  /*
+    Ajout des différents endpoints et des callbacks associés
+  */
+  
   server.on("/sensors", HTTP_GET, std::bind(&WebServiceController::findSensors, this, std::placeholders::_1));
   server.on("/sensors/update-threshold", HTTP_PUT, std::bind(&WebServiceController::updateThreshold, this, std::placeholders::_1));
 

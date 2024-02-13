@@ -5,6 +5,11 @@
 #include <ArduinoJson.h>
 
 
+/*
+Fonction helper permettant de simuler l'utilisation de variable d'environnement.
+Lecture depuis une structure de données json du ssid et du mot de passe d'un point d'accés WIFI.
+*/
+
 String env(String key) {
   
   String configFile = "{\"ssid\":\"Code\ Crafting\ Warrior\", \"password\":\"azertyam\"}"; //simuler un fichier d'environnement
@@ -29,6 +34,10 @@ String env(String key) {
     return ""; 
   }
 }
+
+/*
+Fonction helper permettant de mettre à jour l'affichage sur l'écran TFT
+*/
 
 void updateTftDisplay(TFT_eSPI tft, Sensor lightSensor, Sensor temperatureSensor) {
   tft.fillScreen(TFT_BLACK);

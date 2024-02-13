@@ -2,6 +2,10 @@
 #include "network.h"
 #include "utils.h"
 
+/*
+  Classe utilitaire permettant de gérer la connexion à un point d'accés WIFI
+*/
+
 NetworkManager::NetworkManager() {}
 
 void NetworkManager::connectToWiFi() {

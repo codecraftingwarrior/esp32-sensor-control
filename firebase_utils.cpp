@@ -24,8 +24,7 @@ void FirebaseUtils::init() {
     Serial.printf("%s\n", config.signer.signupError.message.c_str());
   }
 
-  /* Assign the callback function for the long running token generation task */
-  config.token_status_callback = tokenStatusCallback;  //see addons/TokenHelper.h
+  config.token_status_callback = tokenStatusCallback;
 
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
@@ -40,6 +39,21 @@ void FirebaseUtils::storeSensorData(float light, float temperature) {
 
     if (!Firebase.RTDB.setFloat(&fbdo, "readings/temperature", temperature)) {
       Serial.println("Storing temperature FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
+    }
+  }
+}
+
+
+void FirebaseUtils::storeSystemUsage(int cpuUsage, int ramUsage) {
+  if (Firebase.ready() && signupOK) {
+    if (!Firebase.RTDB.setFloat(&fbdo, "readings/cpu", cpuUsage)) {
+      Serial.println("Storing cpu usage FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
+    }
+
+    if (!Firebase.RTDB.setFloat(&fbdo, "readings/ram", ramUsage)) {
+      Serial.println("Storing ram FAILED");
       Serial.println("REASON: " + fbdo.errorReason());
     }
   }
